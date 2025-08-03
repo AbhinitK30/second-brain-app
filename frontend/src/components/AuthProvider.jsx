@@ -21,37 +21,47 @@ export default function AuthProvider({ children }) {
   }, [])
 
   const login = async (email, password) => {
+    console.log("Attempting login...")
     const res = await fetch(API_ENDPOINTS.LOGIN, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     })
     const data = await res.json()
+    console.log("Login response:", data)
     if (res.ok) {
+      console.log("Login successful, setting user state...")
       setUser(data.user)
       setToken(data.token)
       localStorage.setItem("user", JSON.stringify(data.user))
       localStorage.setItem("token", data.token)
+      console.log("User state set:", data.user)
       return { success: true }
     } else {
+      console.log("Login failed:", data.msg)
       return { success: false, msg: data.msg }
     }
   }
 
   const register = async (name, email, password) => {
+    console.log("Attempting registration...")
     const res = await fetch(API_ENDPOINTS.REGISTER, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password }),
     })
     const data = await res.json()
+    console.log("Register response:", data)
     if (res.ok) {
+      console.log("Registration successful, setting user state...")
       setUser(data.user)
       setToken(data.token)
       localStorage.setItem("user", JSON.stringify(data.user))
       localStorage.setItem("token", data.token)
+      console.log("User state set:", data.user)
       return { success: true }
     } else {
+      console.log("Registration failed:", data.msg)
       return { success: false, msg: data.msg }
     }
   }
