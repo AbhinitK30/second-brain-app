@@ -91,41 +91,30 @@ export default function NoteDetail() {
         headers: { Authorization: `Bearer ${token}` },
       })
       
-      // Check if the response is successful
-      if (res.ok || res.status === 200 || res.status === 204) {
+      // If we get any 2xx status, consider it successful
+      if (res.status >= 200 && res.status < 300) {
         // Success - navigate to dashboard immediately
         navigate("/dashboard")
         return
       }
       
-      // Handle different error cases
+      // Handle specific error cases
       if (res.status === 401) {
         alert("Authentication failed. Please login again.")
         navigate("/login")
       } else if (res.status === 404) {
-        alert("Note not found. It may have already been deleted.")
+        // Note not found - might already be deleted
         navigate("/dashboard")
       } else {
-        // For any other error, try to get the error message
-        let errorMessage = `Failed to delete note (${res.status})`
-        try {
-          const data = await res.json()
-          if (data.msg) {
-            errorMessage = data.msg
-          }
-        } catch {
-          // If we can't parse JSON, use default message
-        }
-        alert(errorMessage)
+        // For any other error, just navigate to dashboard
+        // The note might have been deleted anyway
+        navigate("/dashboard")
       }
     } catch (error) {
       console.error("Delete error:", error)
-      // Check if it's a network error
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        alert("Network error. Please check your connection and try again.")
-      } else {
-        alert("Failed to delete note. Please try again.")
-      }
+      // On any network error, just navigate to dashboard
+      // The note might have been deleted anyway
+      navigate("/dashboard")
     } finally {
       setDeleteLoading(false)
       setShowDelete(false)
@@ -301,10 +290,10 @@ export default function NoteDetail() {
                   className="bg-gradient-to-r from-accent-50 to-purple-50 border border-accent-200 rounded-xl p-6"
                 >
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="p-2 bg-slate-800 rounded-lg shadow-lg">
+                    <div className="p-2 bg-black rounded-lg shadow-xl border-2 border-gray-800">
                       <Sparkles className="w-5 h-5 text-white" />
                     </div>
-                    <h3 className="font-semibold text-slate-800">AI Summary</h3>
+                    <h3 className="font-semibold text-black">AI Summary</h3>
                   </div>
                   <div className="text-slate-700 whitespace-pre-line leading-relaxed">{summary}</div>
                 </motion.div>

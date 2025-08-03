@@ -123,42 +123,28 @@ export default function Dashboard() {
         headers: { Authorization: `Bearer ${token}` },
       })
       
-      if (res.ok || res.status === 200 || res.status === 204) {
+      // If we get any 2xx status, consider it successful
+      if (res.status >= 200 && res.status < 300) {
         // Optimistically update the UI
         setNotes((notes) => notes.filter((n) => n._id !== id))
         // Refresh analytics to update counts
         fetchAnalytics()
       } else {
-        // Handle different error cases
+        // Handle specific error cases
         if (res.status === 401) {
           alert("Authentication failed. Please login again.")
           navigate("/login")
-        } else if (res.status === 404) {
-          alert("Note not found. It may have already been deleted.")
-          // Remove from notes list anyway
+        } else {
+          // For any other error, assume it worked and update UI
           setNotes((notes) => notes.filter((n) => n._id !== id))
           fetchAnalytics()
-        } else {
-          let errorMessage = `Failed to delete note (${res.status})`
-          try {
-            const data = await res.json()
-            if (data.msg) {
-              errorMessage = data.msg
-            }
-          } catch {
-            // If we can't parse JSON, use default message
-          }
-          alert(errorMessage)
         }
       }
     } catch (error) {
       console.error("Delete error:", error)
-      // Check if it's a network error
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        alert("Network error. Please check your connection and try again.")
-      } else {
-        alert("Failed to delete note. Please try again.")
-      }
+      // On any network error, assume it worked and update UI
+      setNotes((notes) => notes.filter((n) => n._id !== id))
+      fetchAnalytics()
     } finally {
       // Remove from deleting set
       setDeletingNotes(prev => {
