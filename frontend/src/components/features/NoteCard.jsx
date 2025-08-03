@@ -3,6 +3,7 @@ import { FileText, Link, FileImage, Eye, Edit, Trash2, Sparkles } from "lucide-r
 import Card from "../ui/Card"
 import Badge from "../ui/Badge"
 import Button from "../ui/Button"
+import LoadingSpinner from "../ui/LoadingSpinner"
 import { useState } from "react"
 
 const typeIcons = {
@@ -17,7 +18,7 @@ const typeColors = {
   bookmark: "secondary",
 }
 
-export default function NoteCard({ note, onDelete, onEdit, onView, onSummarize }) {
+export default function NoteCard({ note, onDelete, onEdit, onView, onSummarize, isDeleting = false }) {
   const [showDelete, setShowDelete] = useState(false)
   const Icon = typeIcons[note.type] || FileText
   const colorVariant = typeColors[note.type] || "gray"
@@ -30,7 +31,17 @@ export default function NoteCard({ note, onDelete, onEdit, onView, onSummarize }
   const cancelDelete = () => setShowDelete(false)
 
   return (
-    <Card className="p-6 group relative overflow-visible min-w-[320px]">
+    <Card className={`p-6 group relative overflow-visible min-w-[320px] ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}>
+      {/* Loading Overlay */}
+      {isDeleting && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 rounded-xl">
+          <div className="text-center">
+            <LoadingSpinner size="md" />
+            <p className="mt-2 text-sm text-slate-600">Deleting...</p>
+          </div>
+        </div>
+      )}
+      
       {/* Delete Modal */}
       {showDelete && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/30">
@@ -38,8 +49,8 @@ export default function NoteCard({ note, onDelete, onEdit, onView, onSummarize }
             <h4 className="text-lg font-bold text-red-700 mb-2">Delete Note?</h4>
             <p className="text-slate-700 mb-4">Are you sure you want to delete this note? This action cannot be undone.</p>
             <div className="flex gap-3 justify-center">
-              <Button variant="danger" onClick={confirmDelete} size="sm">Delete</Button>
-              <Button variant="outline" onClick={cancelDelete} size="sm">Cancel</Button>
+              <Button variant="danger" onClick={confirmDelete} size="sm" loading={isDeleting}>Delete</Button>
+              <Button variant="outline" onClick={cancelDelete} size="sm" disabled={isDeleting}>Cancel</Button>
             </div>
           </Card>
         </div>

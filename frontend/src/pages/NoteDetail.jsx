@@ -90,9 +90,19 @@ export default function NoteDetail() {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       })
-      if (res.ok) navigate("/")
-      else alert("Failed to delete note")
-    } catch {
+      if (res.ok) {
+        navigate("/dashboard")
+      } else {
+        const data = await res.json()
+        if (res.status === 401) {
+          alert("Authentication failed. Please login again.")
+          navigate("/login")
+        } else {
+          alert(data.msg || "Failed to delete note")
+        }
+      }
+    } catch (error) {
+      console.error("Delete error:", error)
       alert("Failed to delete note")
     }
     setDeleteLoading(false)

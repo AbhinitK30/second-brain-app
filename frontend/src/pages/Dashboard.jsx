@@ -32,50 +32,55 @@ export default function Dashboard() {
   const [notes, setNotes] = useState([])
   const [notesLoading, setNotesLoading] = useState(true)
   const [notesError, setNotesError] = useState("")
+  const [deletingNotes, setDeletingNotes] = useState(new Set())
 
   // Fetch analytics
-  useEffect(() => {
-    async function fetchAnalytics() {
-      setAnalyticsLoading(true)
-      setAnalyticsError("")
-      try {
-        const res = await fetch(API_ENDPOINTS.NOTE_ANALYTICS, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        const data = await res.json()
-        if (res.ok) {
-          setAnalytics(data)
-        } else {
-          setAnalyticsError(data.msg || "Failed to load analytics")
-        }
-      } catch {
-        setAnalyticsError("Failed to load analytics")
+  const fetchAnalytics = async () => {
+    setAnalyticsLoading(true)
+    setAnalyticsError("")
+    try {
+      const res = await fetch(API_ENDPOINTS.NOTE_ANALYTICS, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setAnalytics(data)
+      } else {
+        setAnalyticsError(data.msg || "Failed to load analytics")
       }
-      setAnalyticsLoading(false)
+    } catch {
+      setAnalyticsError("Failed to load analytics")
     }
+    setAnalyticsLoading(false)
+  }
+
+  // Fetch notes
+  const fetchNotes = async () => {
+    setNotesLoading(true)
+    setNotesError("")
+    try {
+      const res = await fetch(API_ENDPOINTS.NOTES, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setNotes(data)
+      } else {
+        setNotesError(data.msg || "Failed to load notes")
+      }
+    } catch {
+      setNotesError("Failed to load notes")
+    }
+    setNotesLoading(false)
+  }
+
+  // Fetch analytics on mount
+  useEffect(() => {
     fetchAnalytics()
   }, [token])
 
-  // Fetch notes
+  // Fetch notes on mount
   useEffect(() => {
-    async function fetchNotes() {
-      setNotesLoading(true)
-      setNotesError("")
-      try {
-        const res = await fetch(API_ENDPOINTS.NOTES, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        const data = await res.json()
-        if (res.ok) {
-          setNotes(data)
-        } else {
-          setNotesError(data.msg || "Failed to load notes")
-        }
-      } catch {
-        setNotesError("Failed to load notes")
-      }
-      setNotesLoading(false)
-    }
     fetchNotes()
   }, [token])
 
@@ -108,18 +113,39 @@ export default function Dashboard() {
   // Handle note actions
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this note?")) return
+    
+    // Add to deleting set for UI feedback
+    setDeletingNotes(prev => new Set(prev).add(id))
+    
     try {
       const res = await fetch(API_ENDPOINTS.NOTE_BY_ID(id), {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       })
       if (res.ok) {
+        // Optimistically update the UI
         setNotes((notes) => notes.filter((n) => n._id !== id))
+        // Refresh analytics to update counts
+        fetchAnalytics()
       } else {
-        alert("Failed to delete note")
+        const data = await res.json()
+        if (res.status === 401) {
+          alert("Authentication failed. Please login again.")
+          navigate("/login")
+        } else {
+          alert(data.msg || "Failed to delete note")
+        }
       }
-    } catch {
+    } catch (error) {
+      console.error("Delete error:", error)
       alert("Failed to delete note")
+    } finally {
+      // Remove from deleting set
+      setDeletingNotes(prev => {
+        const newSet = new Set(prev)
+        newSet.delete(id)
+        return newSet
+      })
     }
   }
 
@@ -193,6 +219,7 @@ export default function Dashboard() {
                     onEdit={handleEdit}
                     onView={handleView}
                     onSummarize={handleSummarize}
+                    isDeleting={deletingNotes.has(note._id)}
                   />
                 </motion.div>
               ))}

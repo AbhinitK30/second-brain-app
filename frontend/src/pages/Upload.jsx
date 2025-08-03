@@ -284,7 +284,7 @@ export default function Upload() {
                     {isEditing ? "Update Note" : "Create Note"}
                   </Button>
                   {isEditing && (
-                    <Button type="button" variant="outline" onClick={() => navigate("/")}>
+                    <Button type="button" variant="outline" onClick={() => navigate("/dashboard")}>
                       Cancel
                     </Button>
                   )}
@@ -351,7 +351,7 @@ export default function Upload() {
                     Upload PDF
                   </Button>
                   {isEditing && (
-                    <Button type="button" variant="outline" onClick={() => navigate("/")}>
+                    <Button type="button" variant="outline" onClick={() => navigate("/dashboard")}>
                       Cancel
                     </Button>
                   )}
@@ -407,7 +407,7 @@ export default function Upload() {
                     {isEditing ? "Update Bookmark" : "Save Bookmark"}
                   </Button>
                   {isEditing && (
-                    <Button type="button" variant="outline" onClick={() => navigate("/")}>
+                    <Button type="button" variant="outline" onClick={() => navigate("/dashboard")}>
                       Cancel
                     </Button>
                   )}
