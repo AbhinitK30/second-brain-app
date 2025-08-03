@@ -87,7 +87,7 @@ export default function Summary() {
         <Container className="py-8">
           <Card className="p-8 text-center border-red-200 bg-red-50">
             <p className="text-red-600 mb-4">{error}</p>
-            <Button onClick={() => navigate("/")} variant="outline">
+            <Button onClick={() => navigate("/dashboard")} variant="outline">
               Back to Dashboard
             </Button>
           </Card>

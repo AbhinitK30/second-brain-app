@@ -124,7 +124,7 @@ export default function NoteDetail() {
         <Container className="py-8">
           <Card className="p-8 text-center border-red-200 bg-red-50">
             <p className="text-red-600">{error}</p>
-            <Button onClick={() => navigate("/")} variant="outline" className="mt-4">
+            <Button onClick={() => navigate("/dashboard")} variant="outline" className="mt-4">
               Back to Dashboard
             </Button>
           </Card>
@@ -142,7 +142,7 @@ export default function NoteDetail() {
       <Container className="py-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-4xl mx-auto">
           {/* Back Button */}
-          <Button variant="ghost" onClick={() => navigate("/")} className="mb-6">
+          <Button variant="ghost" onClick={() => navigate("/dashboard")} className="mb-6">
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
           </Button>

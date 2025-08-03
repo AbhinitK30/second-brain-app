@@ -103,8 +103,16 @@ export default function Upload() {
             .filter(Boolean),
         }),
       })
-      if (res.ok) navigate("/")
-      else setError((await res.json()).msg || `Failed to ${isEditing ? "update" : "add"} note`)
+      const data = await res.json()
+      if (res.ok) {
+        navigate("/dashboard")
+      } else if (res.status === 401) {
+        setError("Authentication failed. Please login again.")
+        // Redirect to login after a short delay
+        setTimeout(() => navigate("/login"), 2000)
+      } else {
+        setError(data.msg || `Failed to ${isEditing ? "update" : "add"} note`)
+      }
     } catch {
       setError(`Failed to ${isEditing ? "update" : "add"} note`)
     }
@@ -125,8 +133,15 @@ export default function Upload() {
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
       })
-      if (res.ok) navigate("/")
-      else setError((await res.json()).msg || "Failed to upload PDF")
+      const data = await res.json()
+      if (res.ok) {
+        navigate("/dashboard")
+      } else if (res.status === 401) {
+        setError("Authentication failed. Please login again.")
+        setTimeout(() => navigate("/login"), 2000)
+      } else {
+        setError(data.msg || "Failed to upload PDF")
+      }
     } catch {
       setError("Failed to upload PDF")
     }
@@ -158,8 +173,15 @@ export default function Upload() {
             .filter(Boolean),
         }),
       })
-      if (res.ok) navigate("/")
-      else setError((await res.json()).msg || `Failed to ${isEditing ? "update" : "add"} bookmark`)
+      const data = await res.json()
+      if (res.ok) {
+        navigate("/dashboard")
+      } else if (res.status === 401) {
+        setError("Authentication failed. Please login again.")
+        setTimeout(() => navigate("/login"), 2000)
+      } else {
+        setError(data.msg || `Failed to ${isEditing ? "update" : "add"} bookmark`)
+      }
     } catch {
       setError(`Failed to ${isEditing ? "update" : "add"} bookmark`)
     }
@@ -173,7 +195,7 @@ export default function Upload() {
       <Container className="py-8">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-2xl mx-auto">
           {/* Back Button */}
-          <Button variant="ghost" onClick={() => navigate("/")} className="mb-6">
+          <Button variant="ghost" onClick={() => navigate("/dashboard")} className="mb-6">
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
           </Button>
