@@ -31,13 +31,13 @@ export default function NoteCard({ note, onDelete, onEdit, onView, onSummarize, 
   const cancelDelete = () => setShowDelete(false)
 
   return (
-    <Card className={`p-6 group relative overflow-visible min-w-[320px] ${isDeleting ? 'opacity-50 pointer-events-none' : ''}`}>
+    <Card className={`p-6 group relative overflow-visible min-w-[320px] ${isDeleting ? 'opacity-60' : ''}`}>
       {/* Loading Overlay */}
       {isDeleting && (
-        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 rounded-xl">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/90 rounded-xl backdrop-blur-sm">
           <div className="text-center">
             <LoadingSpinner size="md" />
-            <p className="mt-2 text-sm text-slate-600">Deleting...</p>
+            <p className="mt-2 text-sm font-medium text-slate-700">Deleting...</p>
           </div>
         </div>
       )}

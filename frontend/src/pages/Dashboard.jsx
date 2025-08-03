@@ -122,23 +122,43 @@ export default function Dashboard() {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       })
-      if (res.ok) {
+      
+      if (res.ok || res.status === 200 || res.status === 204) {
         // Optimistically update the UI
         setNotes((notes) => notes.filter((n) => n._id !== id))
         // Refresh analytics to update counts
         fetchAnalytics()
       } else {
-        const data = await res.json()
+        // Handle different error cases
         if (res.status === 401) {
           alert("Authentication failed. Please login again.")
           navigate("/login")
+        } else if (res.status === 404) {
+          alert("Note not found. It may have already been deleted.")
+          // Remove from notes list anyway
+          setNotes((notes) => notes.filter((n) => n._id !== id))
+          fetchAnalytics()
         } else {
-          alert(data.msg || "Failed to delete note")
+          let errorMessage = `Failed to delete note (${res.status})`
+          try {
+            const data = await res.json()
+            if (data.msg) {
+              errorMessage = data.msg
+            }
+          } catch {
+            // If we can't parse JSON, use default message
+          }
+          alert(errorMessage)
         }
       }
     } catch (error) {
       console.error("Delete error:", error)
-      alert("Failed to delete note")
+      // Check if it's a network error
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        alert("Network error. Please check your connection and try again.")
+      } else {
+        alert("Failed to delete note. Please try again.")
+      }
     } finally {
       // Remove from deleting set
       setDeletingNotes(prev => {

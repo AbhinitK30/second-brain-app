@@ -141,10 +141,10 @@ export default function Summary() {
                 className="bg-gradient-to-r from-accent-50 to-purple-50 border border-accent-200 rounded-xl p-8"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-3 bg-accent-500 rounded-lg shadow-lg">
+                  <div className="p-3 bg-slate-800 rounded-lg shadow-lg">
                     <Sparkles className="w-6 h-6 text-white" />
                   </div>
-                  <h2 className="text-xl font-semibold text-accent-800">AI-Generated Summary</h2>
+                  <h2 className="text-xl font-semibold text-slate-800">AI-Generated Summary</h2>
                 </div>
                 <div className="prose max-w-none">
                   <div className="text-slate-700 whitespace-pre-line leading-relaxed text-lg">{summary}</div>

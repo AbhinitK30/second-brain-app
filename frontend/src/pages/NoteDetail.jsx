@@ -91,9 +91,9 @@ export default function NoteDetail() {
         headers: { Authorization: `Bearer ${token}` },
       })
       
-      // If status is 200 or 204, consider it successful
+      // Check if the response is successful
       if (res.ok || res.status === 200 || res.status === 204) {
-        // Success - navigate to dashboard
+        // Success - navigate to dashboard immediately
         navigate("/dashboard")
         return
       }
@@ -106,18 +106,17 @@ export default function NoteDetail() {
         alert("Note not found. It may have already been deleted.")
         navigate("/dashboard")
       } else {
-        // Try to get error message from response
+        // For any other error, try to get the error message
+        let errorMessage = `Failed to delete note (${res.status})`
         try {
           const data = await res.json()
-          alert(data.msg || `Failed to delete note (${res.status})`)
-        } catch {
-          // If we can't parse the response, but status indicates success, assume it worked
-          if (res.status >= 200 && res.status < 300) {
-            navigate("/dashboard")
-          } else {
-            alert(`Failed to delete note (${res.status})`)
+          if (data.msg) {
+            errorMessage = data.msg
           }
+        } catch {
+          // If we can't parse JSON, use default message
         }
+        alert(errorMessage)
       }
     } catch (error) {
       console.error("Delete error:", error)
@@ -302,8 +301,10 @@ export default function NoteDetail() {
                   className="bg-gradient-to-r from-accent-50 to-purple-50 border border-accent-200 rounded-xl p-6"
                 >
                   <div className="flex items-center gap-2 mb-4">
-                    <Sparkles className="w-5 h-5 text-accent-600" />
-                    <h3 className="font-semibold text-accent-800">AI Summary</h3>
+                    <div className="p-2 bg-slate-800 rounded-lg shadow-lg">
+                      <Sparkles className="w-5 h-5 text-white" />
+                    </div>
+                    <h3 className="font-semibold text-slate-800">AI Summary</h3>
                   </div>
                   <div className="text-slate-700 whitespace-pre-line leading-relaxed">{summary}</div>
                 </motion.div>
