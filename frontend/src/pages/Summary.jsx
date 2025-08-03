@@ -127,8 +127,8 @@ export default function Summary() {
                 <h1 className="text-3xl font-bold text-slate-900">{note?.title}</h1>
               </div>
 
-              <Button onClick={handleDownload} disabled={!summary} variant="secondary">
-                <Download className="w-4 h-4" />
+              <Button onClick={handleDownload} disabled={!summary} variant="accent" className="font-bold shadow-xl text-white">
+                <Download className="w-4 h-4 mr-2" />
                 Download Summary
               </Button>
             </div>
@@ -141,8 +141,8 @@ export default function Summary() {
                 className="bg-gradient-to-r from-accent-50 to-purple-50 border border-accent-200 rounded-xl p-8"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 bg-accent-500 rounded-lg">
-                    <Sparkles className="w-5 h-5 text-white" />
+                  <div className="p-3 bg-accent-500 rounded-lg shadow-lg">
+                    <Sparkles className="w-6 h-6 text-white" />
                   </div>
                   <h2 className="text-xl font-semibold text-accent-800">AI-Generated Summary</h2>
                 </div>

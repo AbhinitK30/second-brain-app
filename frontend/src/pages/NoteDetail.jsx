@@ -90,23 +90,47 @@ export default function NoteDetail() {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       })
-      if (res.ok) {
+      
+      // If status is 200 or 204, consider it successful
+      if (res.ok || res.status === 200 || res.status === 204) {
+        // Success - navigate to dashboard
+        navigate("/dashboard")
+        return
+      }
+      
+      // Handle different error cases
+      if (res.status === 401) {
+        alert("Authentication failed. Please login again.")
+        navigate("/login")
+      } else if (res.status === 404) {
+        alert("Note not found. It may have already been deleted.")
         navigate("/dashboard")
       } else {
-        const data = await res.json()
-        if (res.status === 401) {
-          alert("Authentication failed. Please login again.")
-          navigate("/login")
-        } else {
-          alert(data.msg || "Failed to delete note")
+        // Try to get error message from response
+        try {
+          const data = await res.json()
+          alert(data.msg || `Failed to delete note (${res.status})`)
+        } catch {
+          // If we can't parse the response, but status indicates success, assume it worked
+          if (res.status >= 200 && res.status < 300) {
+            navigate("/dashboard")
+          } else {
+            alert(`Failed to delete note (${res.status})`)
+          }
         }
       }
     } catch (error) {
       console.error("Delete error:", error)
-      alert("Failed to delete note")
+      // Check if it's a network error
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        alert("Network error. Please check your connection and try again.")
+      } else {
+        alert("Failed to delete note. Please try again.")
+      }
+    } finally {
+      setDeleteLoading(false)
+      setShowDelete(false)
     }
-    setDeleteLoading(false)
-    setShowDelete(false)
   }
   const cancelDelete = () => setShowDelete(false)
 
