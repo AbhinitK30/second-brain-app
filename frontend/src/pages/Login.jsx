@@ -24,7 +24,7 @@ export default function Login() {
     const res = await login(email, password)
     setLoading(false)
     if (res.success) {
-      navigate("/")
+      navigate("/dashboard")
     } else {
       setError(res.msg || "Login failed")
     }

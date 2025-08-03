@@ -25,7 +25,7 @@ export default function Register() {
     const res = await register(name, email, password)
     setLoading(false)
     if (res.success) {
-      navigate("/")
+      navigate("/dashboard")
     } else {
       setError(res.msg || "Registration failed")
     }
