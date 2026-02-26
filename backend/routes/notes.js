@@ -197,24 +197,33 @@ router.post('/search', auth, async (req, res) => {
       const axios = require('axios');
       try {
         const response = await axios.post(
-          'https://api.cohere.ai/v1/generate',
+          'https://api.cohere.com/v2/chat',
           {
             model: 'command-r-plus',
-            prompt: `Answer the following question using the provided notes.\n\nQuestion: ${query}\n\nNotes:\n${context}\n\nAnswer:`,
+            stream: false,
+            messages: [
+              {
+                role: 'user',
+                content: `Answer the following question using the provided notes.\n\nQuestion: ${query}\n\nNotes:\n${context}\n\nAnswer:`,
+              },
+            ],
             max_tokens: 150,
             temperature: 0.3,
-            stop_sequences: ["--END--"]
           },
           {
             headers: {
-              'Authorization': `Bearer ${process.env.COHERE_API_KEY}`,
+              Authorization: `Bearer ${process.env.COHERE_API_KEY}`,
               'Content-Type': 'application/json',
             },
           }
         );
-        answer = response.data.generations?.[0]?.text?.trim() || '';
+        const content = response.data?.message?.content;
+        const firstTextBlock = Array.isArray(content)
+          ? content.find((c) => c.type === 'text')
+          : null;
+        answer = firstTextBlock?.text?.trim() || '';
       } catch (err) {
-        console.error('Cohere answer generation error:', err);
+        console.error('Cohere answer generation error:', err.response?.data || err.message);
         answer = '';
       }
     }
@@ -342,25 +351,34 @@ router.post('/:id/summarize', auth, async (req, res) => {
       else if (textToSummarize.length < 1500) maxTokens = 100;
       else maxTokens = 120;
     }
-    // Call Cohere's generate endpoint for summarization
+    // Call Cohere's Chat endpoint for summarization (v2)
     const axios = require('axios');
     const response = await axios.post(
-      'https://api.cohere.ai/v1/generate',
+      'https://api.cohere.com/v2/chat',
       {
         model: 'command-r-plus',
-        prompt: `Summarize this in 3-4 sentences:\n${textToSummarize}`,
+        stream: false,
+        messages: [
+          {
+            role: 'user',
+            content: `Summarize this in 3-4 sentences:\n${textToSummarize}`,
+          },
+        ],
         max_tokens: maxTokens,
         temperature: 0.3,
-        stop_sequences: ["--END--"]
       },
       {
         headers: {
-          'Authorization': `Bearer ${process.env.COHERE_API_KEY}`,
+          Authorization: `Bearer ${process.env.COHERE_API_KEY}`,
           'Content-Type': 'application/json',
         },
       }
     );
-    const summary = response.data.generations?.[0]?.text?.trim() || 'No summary generated.';
+    const content = response.data?.message?.content;
+    const firstTextBlock = Array.isArray(content)
+      ? content.find((c) => c.type === 'text')
+      : null;
+    const summary = firstTextBlock?.text?.trim() || 'No summary generated.';
     res.json({ summary });
   } catch (err) {
     // Aggressive error logging and reporting

@@ -12,6 +12,10 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// When running behind a proxy (e.g. Render), enable trust proxy so
+// middleware like express-rate-limit can correctly use X-Forwarded-For.
+app.set('trust proxy', 1);
+
 // Middleware
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json()); // Parse JSON bodies
