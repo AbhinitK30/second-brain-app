@@ -199,7 +199,9 @@ router.post('/search', auth, async (req, res) => {
         const response = await axios.post(
           'https://api.cohere.com/v2/chat',
           {
-            model: 'command-r-plus',
+            // command-r-plus was removed; see Cohere docs for current models.
+            // Using command-a-03-2025 as a general-purpose chat model.
+            model: 'command-a-03-2025',
             stream: false,
             messages: [
               {
@@ -356,7 +358,9 @@ router.post('/:id/summarize', auth, async (req, res) => {
     const response = await axios.post(
       'https://api.cohere.com/v2/chat',
       {
-        model: 'command-r-plus',
+        // command-r-plus was removed; see Cohere docs for current models.
+        // Using command-a-03-2025 as a general-purpose chat model.
+        model: 'command-a-03-2025',
         stream: false,
         messages: [
           {
